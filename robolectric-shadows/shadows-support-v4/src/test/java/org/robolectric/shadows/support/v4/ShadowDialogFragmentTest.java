@@ -18,8 +18,11 @@ import org.robolectric.Robolectric;
 import org.robolectric.internal.ShadowExtractor;
 import org.robolectric.shadows.ShadowDialog;
 import org.robolectric.util.TestRunnerWithManifest;
-import org.robolectric.util.Transcript;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -43,16 +46,7 @@ public class ShadowDialogFragmentTest {
   public void show_shouldCallLifecycleMethods() throws Exception {
     dialogFragment.show(fragmentManager, "this is a tag");
 
-    dialogFragment.transcript.assertEventsSoFar(
-        "onAttach",
-        "onCreate",
-        "onCreateDialog",
-        "onCreateView",
-        "onViewCreated",
-        "onActivityCreated",
-        "onStart",
-        "onResume"
-    );
+    assertThat(dialogFragment.transcript).containsExactly("onAttach", "onCreate", "onCreateDialog", "onCreateView", "onViewCreated", "onActivityCreated", "onStart", "onResume");
 
     assertNotNull(dialogFragment.getActivity());
     assertSame(activity, dialogFragment.onAttachActivity);
@@ -62,16 +56,7 @@ public class ShadowDialogFragmentTest {
   public void show_whenPassedATransaction_shouldCallShowWithManager() throws Exception {
     dialogFragment.show(fragmentManager.beginTransaction(), "this is a tag");
 
-    dialogFragment.transcript.assertEventsSoFar(
-        "onAttach",
-        "onCreate",
-        "onCreateDialog",
-        "onCreateView",
-        "onViewCreated",
-        "onActivityCreated",
-        "onStart",
-        "onResume"
-    );
+    assertThat(dialogFragment.transcript).containsExactly("onAttach", "onCreate", "onCreateDialog", "onCreateView", "onViewCreated", "onActivityCreated", "onStart", "onResume");
 
     assertNotNull(dialogFragment.getActivity());
     assertSame(activity, dialogFragment.onAttachActivity);
@@ -114,7 +99,7 @@ public class ShadowDialogFragmentTest {
   }
 
   private class TestDialogFragment extends DialogFragment {
-    final Transcript transcript = new Transcript();
+    final List<String> transcript = new ArrayList<>();
     Activity onAttachActivity;
     private Dialog returnThisDialogFromOnCreateDialog;
 

@@ -28,9 +28,12 @@ import android.os.Looper;
 import android.view.Window;
 import android.widget.LinearLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RunWith(TestRunners.SelfTest.class)
 public class ActivityControllerTest {
-  private static final Transcript transcript = new Transcript();
+  private static final List<String> transcript = new ArrayList<>();
   private final ComponentName componentName = new ComponentName("org.robolectric", MyActivity.class.getName());
   private final ActivityController<MyActivity> controller = Robolectric.buildActivity(MyActivity.class);
 
@@ -105,7 +108,7 @@ public class ActivityControllerTest {
     ShadowLooper.unPauseMainLooper();
     controller.create();
     assertThat(shadowOf(Looper.getMainLooper()).isPaused()).isFalse();
-    transcript.assertEventsInclude("finishedOnCreate", "onCreate");
+    TestUtil.assertStringsInclude(transcript, "finishedOnCreate", "onCreate");
   }
 
   @Test
@@ -113,10 +116,10 @@ public class ActivityControllerTest {
     ShadowLooper.pauseMainLooper();
     controller.create();
     assertThat(shadowOf(Looper.getMainLooper()).isPaused()).isTrue();
-    transcript.assertEventsInclude("finishedOnCreate");
+    TestUtil.assertStringsInclude(transcript, "finishedOnCreate");
 
     ShadowLooper.unPauseMainLooper();
-    transcript.assertEventsInclude("onCreate");
+    TestUtil.assertStringsInclude(transcript, "onCreate");
   }
 
   @Test
@@ -128,80 +131,80 @@ public class ActivityControllerTest {
   @Test
   public void start_callsPerformStartWhilePaused() {
     controller.create().start();
-    transcript.assertEventsInclude("finishedOnStart", "onStart");
+    TestUtil.assertStringsInclude(transcript, "finishedOnStart", "onStart");
   }
 
   @Test
   public void stop_callsPerformStopWhilePaused() {
     controller.create().start().stop();
-    transcript.assertEventsInclude("finishedOnStop", "onStop");
+    TestUtil.assertStringsInclude(transcript, "finishedOnStop", "onStop");
   }
 
   @Test
   public void restart_callsPerformRestartWhilePaused() {
     controller.create().start().stop().restart();
-    transcript.assertEventsInclude("finishedOnRestart", "onRestart");
+    TestUtil.assertStringsInclude(transcript, "finishedOnRestart", "onRestart");
   }
 
   @Test
   public void pause_callsPerformPauseWhilePaused() {
     controller.create().pause();
-    transcript.assertEventsInclude("finishedOnPause", "onPause");
+    TestUtil.assertStringsInclude(transcript, "finishedOnPause", "onPause");
   }
 
   @Test
   public void resume_callsPerformResumeWhilePaused() {
     controller.create().start().resume();
-    transcript.assertEventsInclude("finishedOnResume", "onResume");
+    TestUtil.assertStringsInclude(transcript, "finishedOnResume", "onResume");
   }
 
   @Test
   public void destroy_callsPerformDestroyWhilePaused() {
     controller.create().destroy();
-    transcript.assertEventsInclude("finishedOnDestroy", "onDestroy");
+    TestUtil.assertStringsInclude(transcript, "finishedOnDestroy", "onDestroy");
   }
 
   @Test
   public void postCreate_callsOnPostCreateWhilePaused() {
     controller.create().postCreate(new Bundle());
-    transcript.assertEventsInclude("finishedOnPostCreate", "onPostCreate");
+    TestUtil.assertStringsInclude(transcript, "finishedOnPostCreate", "onPostCreate");
   }
 
   @Test
   public void postResume_callsOnPostResumeWhilePaused() {
     controller.create().postResume();
-    transcript.assertEventsInclude("finishedOnPostResume", "onPostResume");
+    TestUtil.assertStringsInclude(transcript, "finishedOnPostResume", "onPostResume");
   }
 
   @Test
   public void restoreInstanceState_callsPerformRestoreInstanceStateWhilePaused() {
     controller.create().restoreInstanceState(new Bundle());
-    transcript.assertEventsInclude("finishedOnRestoreInstanceState", "onRestoreInstanceState");
+    TestUtil.assertStringsInclude(transcript, "finishedOnRestoreInstanceState", "onRestoreInstanceState");
   }
 
   @Test
   public void newIntent_callsOnNewIntentWhilePaused() {
     controller.create().newIntent(new Intent(Intent.ACTION_VIEW));
-    transcript.assertEventsInclude("finishedOnNewIntent", "onNewIntent");
+    TestUtil.assertStringsInclude(transcript, "finishedOnNewIntent", "onNewIntent");
   }
 
   @Test
   public void userLeaving_callsPerformUserLeavingWhilePaused() {
     controller.create().userLeaving();
-    transcript.assertEventsInclude("finishedOnUserLeaveHint", "onUserLeaveHint");
+    TestUtil.assertStringsInclude(transcript, "finishedOnUserLeaveHint", "onUserLeaveHint");
   }
 
   @Test
   public void setup_callsLifecycleMethodsAndMakesVisible() {
     controller.setup();
-    transcript.assertEventsInclude("onCreate", "onStart", "onPostCreate", "onResume", "onPostResume");
+    TestUtil.assertStringsInclude(transcript, "onCreate", "onStart", "onPostCreate", "onResume", "onPostResume");
     assertEquals(controller.get().getWindow().getDecorView().getParent().getClass().getName(), "android.view.ViewRootImpl");
   }
 
   @Test
   public void setupWithBundle_callsLifecycleMethodsAndMakesVisible() {
     controller.setup(new Bundle());
-    transcript.assertEventsInclude("onCreate", "onStart", "onRestoreInstanceState", "onPostCreate", "onResume", "onPostResume");
+    TestUtil.assertStringsInclude(transcript, "onCreate", "onStart", "onRestoreInstanceState", "onPostCreate", "onResume", "onPostResume");
     assertEquals(controller.get().getWindow().getDecorView().getParent().getClass().getName(), "android.view.ViewRootImpl");
   }
 
@@ -228,8 +231,8 @@ public class ActivityControllerTest {
     final float newFontScale = config.fontScale *= 2;
     
     controller.configurationChange(config);
-    transcript.assertEventsInclude(
-        "onPause",
+    TestUtil.assertStringsInclude(
+        transcript, "onPause",
         "onStop",
         "onDestroy",
         "onCreate",
@@ -247,7 +250,7 @@ public class ActivityControllerTest {
     
     ActivityController<ConfigAwareActivity> configController = Robolectric.buildActivity(ConfigAwareActivity.class);
     configController.configurationChange(config);
-    transcript.assertEventsInclude("onConfigurationChanged");
+    TestUtil.assertStringsInclude(transcript, "onConfigurationChanged");
     assertThat(configController.get().getResources().getConfiguration().fontScale).isEqualTo(newFontScale);
   }
   
@@ -259,7 +262,7 @@ public class ActivityControllerTest {
     
     ActivityController<ConfigAwareActivity> configController = Robolectric.buildActivity(ConfigAwareActivity.class);
     configController.configurationChange(config);
-    transcript.assertEventsInclude("onPause", "onStop", "onDestroy", "onCreate", "onStart", "onResume");
+    TestUtil.assertStringsInclude(transcript, "onPause", "onStop", "onDestroy", "onCreate", "onStart", "onResume");
     assertThat(configController.get().getResources().getConfiguration().fontScale).isEqualTo(newFontScale);
     assertThat(configController.get().getResources().getConfiguration().orientation).isEqualTo(newOrientation);
   }

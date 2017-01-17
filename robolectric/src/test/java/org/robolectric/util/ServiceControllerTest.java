@@ -18,9 +18,12 @@ import android.os.Looper;
 import org.robolectric.shadows.CoreShadowsAdapter;
 import org.robolectric.shadows.ShadowLooper;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RunWith(TestRunners.SelfTest.class)
 public class ServiceControllerTest {
-  private static final Transcript transcript = new Transcript();
+  private static final List<String> transcript = new ArrayList<>();
   private final ComponentName componentName = new ComponentName("org.robolectric", MyService.class.getName());
   private final ServiceController<MyService> controller = Robolectric.buildService(MyService.class);
 
@@ -63,7 +66,7 @@ public class ServiceControllerTest {
     ShadowLooper.unPauseMainLooper();
     controller.create();
     assertThat(shadowOf(Looper.getMainLooper()).isPaused()).isFalse();
-    transcript.assertEventsInclude("finishedOnCreate", "onCreate");
+    TestUtil.assertStringsInclude(transcript, "finishedOnCreate", "onCreate");
   }
 
   @Test
@@ -71,40 +74,40 @@ public class ServiceControllerTest {
     ShadowLooper.pauseMainLooper();
     controller.create();
     assertThat(shadowOf(Looper.getMainLooper()).isPaused()).isTrue();
-    transcript.assertEventsInclude("finishedOnCreate");
+    TestUtil.assertStringsInclude(transcript, "finishedOnCreate");
 
     ShadowLooper.unPauseMainLooper();
-    transcript.assertEventsInclude("onCreate");
+    TestUtil.assertStringsInclude(transcript, "onCreate");
   }
 
   @Test
   public void unbind_callsUnbindWhilePaused() {
     controller.create().bind().unbind();
-    transcript.assertEventsInclude("finishedOnUnbind", "onUnbind");
+    TestUtil.assertStringsInclude(transcript, "finishedOnUnbind", "onUnbind");
   }
 
   @Test
   public void rebind_callsRebindWhilePaused() {
     controller.create().bind().unbind().bind().rebind();
-    transcript.assertEventsInclude("finishedOnRebind", "onRebind");
+    TestUtil.assertStringsInclude(transcript, "finishedOnRebind", "onRebind");
   }
 
   @Test
   public void destroy_callsOnDestroyWhilePaused() {
     controller.create().destroy();
-    transcript.assertEventsInclude("finishedOnDestroy", "onDestroy");
+    TestUtil.assertStringsInclude(transcript, "finishedOnDestroy", "onDestroy");
   }
 
   @Test
   public void bind_callsOnBindWhilePaused() {
     controller.create().bind();
-    transcript.assertEventsInclude("finishedOnBind", "onBind");
+    TestUtil.assertStringsInclude(transcript, "finishedOnBind", "onBind");
   }
 
   @Test
   public void startCommand_callsOnStartCommandWhilePaused() {
     controller.create().startCommand(1, 2);
-    transcript.assertEventsInclude("finishedOnStartCommand", "onStartCommand");
+    TestUtil.assertStringsInclude(transcript, "finishedOnStartCommand", "onStartCommand");
   }
 
   public static class MyService extends Service {
