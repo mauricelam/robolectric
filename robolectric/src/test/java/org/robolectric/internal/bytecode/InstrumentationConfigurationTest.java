@@ -14,7 +14,7 @@ public class InstrumentationConfigurationTest {
   @Before
   public void setUp() throws Exception {
     InstrumentationConfiguration.Builder builder = InstrumentationConfiguration.newBuilder();
-    RobolectricTestRunner.configure(builder);
+    RobolectricTestRunner.configure(builder, new AndroidInterceptors().build());
     config = builder.build();
   }
 

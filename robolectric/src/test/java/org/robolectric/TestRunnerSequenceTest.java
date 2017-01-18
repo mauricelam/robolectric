@@ -11,7 +11,9 @@ import org.robolectric.annotation.Config;
 import org.robolectric.annotation.internal.DoNotInstrument;
 import org.robolectric.internal.SdkConfig;
 import org.robolectric.internal.SdkEnvironment;
+import org.robolectric.internal.bytecode.AndroidInterceptors;
 import org.robolectric.internal.bytecode.InstrumentationConfiguration;
+import org.robolectric.internal.bytecode.Interceptors;
 import org.robolectric.manifest.AndroidManifest;
 
 import java.lang.reflect.Method;
@@ -87,7 +89,7 @@ public class TestRunnerSequenceTest {
     @NotNull
     @Override public InstrumentationConfiguration createClassLoaderConfig(Config config) {
       InstrumentationConfiguration.Builder builder = InstrumentationConfiguration.newBuilder();
-      RobolectricTestRunner.configure(builder);
+      RobolectricTestRunner.configure(builder, new AndroidInterceptors().build());
       builder.doNotAcquireClass(StateHolder.class);
       return builder.build();
     }
