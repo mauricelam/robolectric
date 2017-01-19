@@ -31,7 +31,7 @@ public class PackageResourceTable implements ResourceTable {
     return packageName;
   }
 
-  public synchronized Integer getResourceId(ResName resName) {
+  public Integer getResourceId(ResName resName) {
     if (resName == null) {
       return null;
     }
@@ -42,7 +42,7 @@ public class PackageResourceTable implements ResourceTable {
   }
 
   @Override
-  public synchronized ResName getResName(int resourceId) {
+  public ResName getResName(int resourceId) {
     return resourceTable.get(resourceId);
   }
 
@@ -92,7 +92,7 @@ public class PackageResourceTable implements ResourceTable {
   // TODO: Merge this method with the addResource(String, String, TypedResource) so that the ID is provided by the
   // caller. When we start to read arsc files the ID will already be provided so we want to write the id, name, type and
   // value information in the same call rather than split up like this.
-  synchronized void addResource(int id, String type, String name) {
+  void addResource(int id, String type, String name) {
     // We need to record the resource identifiers for Android as they are not generated with AAPT and are only selectively
     // available in the android.R / com.android.internal.R so we will generate identifiers where they don't exist as they
     // are written into the resource table.
