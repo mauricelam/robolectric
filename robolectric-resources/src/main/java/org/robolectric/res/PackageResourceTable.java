@@ -89,13 +89,6 @@ public class PackageResourceTable implements ResourceTable {
     resources.receive(visitor);
   }
 
-  @Override
-  public boolean hasValue(ResName resName, String qualifiers) {
-    return getValue(resName, qualifiers) != null
-        || getXml(resName, qualifiers) != null
-        || getRawValue(resName, qualifiers) != null;
-  }
-
   // TODO: Merge this method with the addResource(String, String, TypedResource) so that the ID is provided by the
   // caller. When we start to read arsc files the ID will already be provided so we want to write the id, name, type and
   // value information in the same call rather than split up like this.
